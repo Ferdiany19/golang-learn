@@ -4,38 +4,38 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 )
 
+// disiapkan utk mem-parsing penulisan tipe map tsb
+type M map[string]interface{}
+
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Join folder dan file menjadi path
-		var filepath = path.Join("views", "index.html")
-		// mem-parsing fike template dan mengembalikan 2 data
-		var tmpl, err = template.ParseFiles(filepath)
-		if err != nil {
-			// cek error 500 internel server
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	// memparsing semua file yang match dengan pattern yang ditentukan, dan fungsi ini mengembalikan 2 objek: *template.Template & error
+	// Pattern path pada fungsi template.ParseGlob() nantinya akan diproses oleh filepath.Glob()
+	var tmpl, err = template.ParseGlob("views/*")
+	if err != nil {
+		panic(err.Error())
+		return
+	}
 
-		// untuk menyisipkan ke template yang sudah di parsing
-		var data = map[string]interface{}{
-			"title": "Learning Golang",
-			"name":  "Batman",
-		}
-
-		// Execute utk menyisipkan data pada template, utk ditampilkan ke browser
-		err = tmpl.Execute(w, data)
+	http.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
+		var data = M{"name": "Batman"}
+		// param ke 1 obj, ke 2 nama template, ke3 data
+		err = tmpl.ExecuteTemplate(w, "index", data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 
-	http.Handle("/static/",
-		http.StripPrefix("/static/",
-			http.FileServer(http.Dir("assets"))))
+	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
+		var data = M{"name": "Batman"}
+		// param ke 1 obj, ke 2 nama template, ke3 data
+		err = tmpl.ExecuteTemplate(w, "about", data)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 
-	fmt.Println("Server Started localhost:9000")
+	fmt.Println("server started at localhost:9000")
 	http.ListenAndServe(":9000", nil)
 }
