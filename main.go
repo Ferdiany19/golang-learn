@@ -21,7 +21,13 @@ func main() {
 	http.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
 		var data = M{"name": "Batman"}
 		// param ke 1 obj, ke 2 nama template, ke3 data
-		err = tmpl.ExecuteTemplate(w, "index", data)
+		var tmpl = template.Must(template.ParseFiles(
+			"views/index.html",
+			"views/_header.html",
+			"views/_message.html",
+		))
+
+		var err = tmpl.ExecuteTemplate(w, "index", data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -30,7 +36,13 @@ func main() {
 	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		var data = M{"name": "Batman"}
 		// param ke 1 obj, ke 2 nama template, ke3 data
-		err = tmpl.ExecuteTemplate(w, "about", data)
+		var tmpl = template.Must(template.ParseFiles(
+			"views/index.html",
+			"views/_header.html",
+			"views/_message.html",
+		))
+
+		var err = tmpl.ExecuteTemplate(w, "about", data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
